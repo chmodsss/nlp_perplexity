@@ -1,4 +1,4 @@
-import string
+import os,string
 
 puncts = string.punctuation.replace('.','')
 punct = str.maketrans('','', puncts)

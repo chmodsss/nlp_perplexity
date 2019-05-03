@@ -7,13 +7,14 @@ working: extract the noun chunks from the sentence, compute tf-idf values. based
 from sklearn.feature_extraction.text import TfidfVectorizer
 from data_clean import get_clean_data
 import spacy, nltk
+import pandas as pd
 
 corpus = get_clean_data()
 sent_tokens = nltk.sent_tokenize(corpus)
 Vectorizer = TfidfVectorizer()
 tfidf_matrix = Vectorizer.fit_transform(sent_tokens)
 vocab = Vectorizer.get_feature_names()
-nlp_pipeline = spacy.load('en')
+nlp_pipeline = spacy.load('en_core_web_sm')
 
 # get_nouns() selects only the nouns from the sentences, so that only relevant information are selected i.e, nouns
 def get_nouns(sent):
@@ -32,13 +33,14 @@ def get_tfidf(sent):
         tfidf_values[vocab[idx]] = data
     return tfidf_values
 
-with open('testdata') as f:
-    testdata = f.read()
+def get_results():
+    testdata = pd.read_csv('testdata.csv')
 
-test_sents = nltk.sent_tokenize(testdata)
-for sent in test_sents:
-    nouns = get_nouns(sent)
-    print("nouns", nouns)
-    tfidf = get_tfidf([nouns])
-    print("Tfidf. . . ", tfidf)
+    tfidf_all = []
+    for idx,sent in enumerate(testdata.text):
+        nouns = get_nouns(sent)
+        tfidf = get_tfidf([nouns])
+        print("Tfidf. . . ", tfidf)
+        tfidf_all.append([testdata.context[idx], tfidf])
+    return tfidf_all
 
